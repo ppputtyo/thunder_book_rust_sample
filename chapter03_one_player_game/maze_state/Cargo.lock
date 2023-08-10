@@ -9,14 +9,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "chapter03_one_player_game"
-version = "0.1.0"
-dependencies = [
- "rand",
- "rand_mt",
-]
-
-[[package]]
 name = "getrandom"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -32,6 +24,14 @@ name = "libc"
 version = "0.2.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
+
+[[package]]
+name = "maze_state"
+version = "0.1.0"
+dependencies = [
+ "rand",
+ "rand_mt",
+]
 
 [[package]]
 name = "ppv-lite86"
