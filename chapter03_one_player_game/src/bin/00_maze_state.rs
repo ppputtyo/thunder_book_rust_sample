@@ -77,7 +77,7 @@ impl MazeState {
         self.character.x = (self.character.x as i32 + Self::DX[action]) as usize;
         self.character.y = (self.character.y as i32 + Self::DY[action]) as usize;
 
-        let point = &mut self.points[self.character.y as usize][self.character.x as usize];
+        let point = &mut self.points[self.character.y][self.character.x];
 
         self.game_score += *point;
         *point = 0;
