@@ -2,10 +2,14 @@ use rand::Rng;
 use rand_mt::{Mt, Mt19937GenRand32};
 
 /// 座標を保持する
+#[derive(Clone)]
 struct Coord {
     x: usize,
     y: usize,
 }
+
+type ScoreType = i64; // ゲームの評価スコアの型を決めておく
+const INF: ScoreType = 1000000000; // あり得ないぐらい大きなスコアの例を用意しておく
 
 /// 迷路の高さ
 const H: usize = 3;
@@ -24,6 +28,7 @@ impl Coord {
 /// 1ターンに上下左右四方向のいずれかに1マスずつ進む。
 /// 床にあるポイントを踏むと自身のスコアとなり、床のポイントが消える。
 /// END_TURNの時点のスコアを高くすることが目的
+#[derive(Clone)]
 struct MazeState {
     /// 床のポイントを1~9で表現する
     points: Vec<Vec<usize>>,
@@ -32,6 +37,8 @@ struct MazeState {
     character: Coord,
     /// ゲーム上で実際に得たスコア
     game_score: usize,
+    /// 探索上で評価したスコア
+    evaluated_score: ScoreType,
 }
 
 impl MazeState {
@@ -59,12 +66,18 @@ impl MazeState {
             turn: 0,
             character,
             game_score: 0,
+            evaluated_score: 0,
         }
     }
 
     /// [どのゲームでも実装する] : ゲームの終了判定
     fn is_done(&self) -> bool {
         self.turn == END_TURN
+    }
+
+    /// [どのゲームでも実装する] : 探索用の盤面評価をする
+    fn evaluateScore(&mut self) {
+        self.evaluated_score = self.game_score as ScoreType;
     }
 
     /// 右、左、下、上への移動方向のx成分
@@ -133,15 +146,34 @@ fn random_action(state: &State, mt_for_action: &mut Mt19937GenRand32) -> usize {
     legal_actions[mt_for_action.gen::<u32>() as usize % legal_actions.len()]
 }
 
+/// 貪欲法で行動を決定する
+fn greedy_action(state: &State) -> usize {
+    let legal_actions = state.legal_actions();
+    let mut best_score = -INF;
+    let mut best_action = 4;
+
+    for action in legal_actions {
+        let mut now_state = state.clone();
+        now_state.advance(action);
+        now_state.evaluateScore();
+
+        if now_state.evaluated_score > best_score {
+            best_score = now_state.evaluated_score;
+            best_action = action;
+        }
+    }
+
+    best_action
+}
+
 /// シードを指定してゲーム状況を表示しながらAIにプレイさせる。
 fn play_game(seed: u32) {
     let mut state = MazeState::new(seed);
-    let mut mt_for_action = Mt::new(0); // 行動選択用の乱数生成器を初期化
 
     println!("{}", state.to_string());
 
     while !state.is_done() {
-        state.advance(random_action(&state, &mut mt_for_action));
+        state.advance(greedy_action(&state));
         println!("{}", state.to_string());
     }
 }

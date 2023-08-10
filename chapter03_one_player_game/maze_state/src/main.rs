@@ -7,9 +7,6 @@ struct Coord {
     y: usize,
 }
 
-type ScoreType = i64; // ゲームの評価スコアの型を決めておく
-const INF: ScoreType = 1000000000; // あり得ないぐらい大きなスコアの例を用意しておく
-
 /// 迷路の高さ
 const H: usize = 3;
 /// 迷路の幅
@@ -134,16 +131,6 @@ type State = MazeState;
 fn random_action(state: &State, mt_for_action: &mut Mt19937GenRand32) -> usize {
     let legal_actions = state.legal_actions();
     legal_actions[mt_for_action.gen::<u32>() as usize % legal_actions.len()]
-}
-
-/// 貪欲法で行動を決定する
-fn greedy_action(state: &State) {
-    let legal_actions = state.legal_actions();
-    let best_score = -INF;
-
-    for action in legal_actions {
-        let now_state = state.clone();
-    }
 }
 
 /// シードを指定してゲーム状況を表示しながらAIにプレイさせる。
